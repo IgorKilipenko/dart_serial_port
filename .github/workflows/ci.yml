@@ -14,18 +14,8 @@ jobs:
       uses: actions/checkout@v2
     - name: Install Dart
       uses: dart-lang/setup-dart@v1
-    - name: Get Dependencies
-      run: dart pub get
     - name: Install libserialport
-      run: |
-        git clone https://github.com/sigrokproject/libserialport.git
-        cd libserialport
-        ./autogen.sh
-        ./configure
-        make -j $(nproc)
-        sudo make install
-        sudo ldconfig
-        cd -
+      run: sudo apt install -y libserialport0
     - name: Install tty0tty
       run: |
         git clone https://github.com/lcgamboa/tty0tty.git
@@ -38,5 +28,10 @@ jobs:
       run: tty0tty &
     - name: Fixup Permissions
       run: sudo chmod a+rw /dev/tnt*
+    - name: Get Dependencies
+      run: dart pub get
     - name: Run Tests
       run: dart pub run test
+      env:
+        # Ubuntu doesn't install libserialport.so
+        LIBSERIALPORT_PATH: libserialport.so.0
